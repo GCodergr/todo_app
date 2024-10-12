@@ -1,0 +1,10 @@
+# Build output
+*.exe
+*.dll
+
+# Debug output
+*.pdb
+*.rdi
+
+# Odin related
+ols.json
