@@ -43,7 +43,7 @@ draw :: proc() {
 	result := rl.GuiTextInputBox({10, 30, 600, 300}, "Input todo tasks", "Enter a Task", "Add", 
 								cstring(&active_input_buffer[0]), 256, &secret_view)
 	
-	if result == 1 {
+	if result == 1 && active_input_buffer[0] != 0 {		
 		new_task := get_cloned_string(cstring(&active_input_buffer[0]))
 		_, err := append_elem(&tasks, new_task)
 		assert(err == .None)
