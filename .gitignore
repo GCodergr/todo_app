@@ -8,3 +8,6 @@
 
 # Odin related
 ols.json
+
+# Application state
+tasks.json

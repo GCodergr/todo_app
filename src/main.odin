@@ -1,14 +1,24 @@
 package todo_app
 
+import "core:os"
+import "core:fmt"
+import "core:encoding/json"
 import rl "vendor:raylib"
 
 active_input_buffer := [256]u8{}
-tasks := [dynamic]string{}
+
+App_State :: struct {
+	tasks : [dynamic]string,
+}
+
+app_state : App_State
 
 WINDOW_WIDTH :: 1280
 WINDOW_HEIGHT :: 720
 
-main :: proc(){
+SAVE_TASKS :: true
+
+main :: proc() {
 	init_window()
 	init_app()
 
@@ -28,6 +38,17 @@ init_window :: proc() {
 
 init_app :: proc() {
 	rl.GuiSetStyle(.DEFAULT, cast(i32)rl.GuiDefaultProperty.TEXT_SIZE, 30)	
+
+	if SAVE_TASKS {
+		if app_state_data, ok := os.read_entire_file("tasks.json", context.temp_allocator); ok {
+			error := json.unmarshal(app_state_data, &app_state)
+			if error != nil {
+				fmt.println("Failed to unmarshal application state data.\nError type: ", error)
+			}
+		} else {
+			fmt.println("Failed to read tasks.json file. It will be created on application exit.")
+		}
+	}	
 }
 
 app_update :: proc() -> bool {	
@@ -45,7 +66,7 @@ draw :: proc() {
 	
 	if result == 1 && active_input_buffer[0] != 0 {		
 		new_task := get_cloned_string(cstring(&active_input_buffer[0]))
-		_, err := append_elem(&tasks, new_task)
+		_, err := append_elem(&app_state.tasks, new_task)
 		assert(err == .None)
 	}
 
@@ -54,7 +75,7 @@ draw :: proc() {
 
 	remove_text_width := f32(rl.MeasureText("Remove", 30))
 
-	for task, i in tasks {
+	for task, i in app_state.tasks {
 		// Allocate a buffer for the cstring
 		task_buffer := make([]u8, len(task) + 1)
 		defer delete(task_buffer)
@@ -70,7 +91,7 @@ draw :: proc() {
 					task_cstring)
 
 		if rl.GuiButton({WINDOW_WIDTH - remove_text_width - 80, (f32(i) * 40) + OFFSET_Y, 180, 30}, "Remove") {
-			ordered_remove(&tasks, i)
+			ordered_remove(&app_state.tasks, i)
 		}
 	}	
 
@@ -78,7 +99,14 @@ draw :: proc() {
 }
 
 shutdown_app :: proc() {
-	delete(tasks)	
+	if SAVE_TASKS {
+		if app_state_data, err := json.marshal(app_state, allocator = context.temp_allocator); err == nil {
+			os.write_entire_file("tasks.json", app_state_data)
+		}
+	}
+
+	free_all(context.temp_allocator)
+	delete(app_state.tasks)	
 }
 
 shutdown_window :: proc() {
