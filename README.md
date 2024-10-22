@@ -6,8 +6,6 @@ Inspired by [Making a Desktop App with a Game Library](https://youtu.be/KSKzaeZJ
 
 # Building and running
 
-Source code is located at `src` folder.
-
 `build_release.bat` will make a release executable.
 
 `build_debug.bat` will make a debuggable executable.
@@ -15,3 +13,14 @@ Source code is located at `src` folder.
 `run_release.bat` builds and runs the release executable.
 
 `run_debug.bat` builds and runs the debuggable executable.
+
+# Code
+
+Source code is located at `src` folder.
+
+By default tasks are saved to `tasks.json` .
+
+Set **SAVE_TASKS** constant to false to prevent save/load from `tasks.json` .
+```Odin
+SAVE_TASKS :: true
+```

@@ -16,6 +16,7 @@ app_state : App_State
 WINDOW_WIDTH :: 1280
 WINDOW_HEIGHT :: 720
 
+// Set to false if you don't want to save tasks to tasks.json
 SAVE_TASKS :: true
 
 main :: proc() {
