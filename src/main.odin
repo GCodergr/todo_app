@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:encoding/json"
 import rl "vendor:raylib"
 
+font : rl.Font
 active_input_buffer := [256]u8{}
 
 App_State :: struct {
@@ -39,6 +40,9 @@ init_window :: proc() {
 
 init_app :: proc() {
 	rl.GuiSetStyle(.DEFAULT, cast(i32)rl.GuiDefaultProperty.TEXT_SIZE, 30)	
+
+	font = rl.LoadFontEx("./fonts/JetBrainsMono-Bold.ttf", 30, nil, 250)
+	rl.GuiSetFont(font)
 
 	if SAVE_TASKS {
 		if app_state_data, ok := os.read_entire_file("tasks.json", context.temp_allocator); ok {
@@ -106,6 +110,7 @@ shutdown_app :: proc() {
 		}
 	}
 
+	rl.UnloadFont(font)
 	free_all(context.temp_allocator)
 	delete(app_state.tasks)	
 }
