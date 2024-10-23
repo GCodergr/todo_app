@@ -17,6 +17,8 @@ app_state : App_State
 WINDOW_WIDTH :: 1280
 WINDOW_HEIGHT :: 720
 
+FONT_SIZE :: 30
+
 // Set to false if you don't want to save tasks to tasks.json
 SAVE_TASKS :: true
 
@@ -39,9 +41,9 @@ init_window :: proc() {
 }
 
 init_app :: proc() {
-	rl.GuiSetStyle(.DEFAULT, cast(i32)rl.GuiDefaultProperty.TEXT_SIZE, 30)	
+	rl.GuiSetStyle(.DEFAULT, cast(i32)rl.GuiDefaultProperty.TEXT_SIZE, FONT_SIZE)	
 
-	font = rl.LoadFontEx("./fonts/JetBrainsMono-Bold.ttf", 30, nil, 250)
+	font = rl.LoadFontEx("./fonts/JetBrainsMono-Bold.ttf", FONT_SIZE, nil, 250)
 	rl.GuiSetFont(font)
 
 	if SAVE_TASKS {
@@ -78,7 +80,7 @@ draw :: proc() {
 	STARTING_POSITION_X :: 650
 	OFFSET_Y :: 30
 
-	remove_text_width := f32(rl.MeasureText("Remove", 30))
+	remove_text_width := f32(rl.MeasureText("Remove", FONT_SIZE))
 
 	for task, i in app_state.tasks {
 		// Allocate a buffer for the cstring
@@ -91,7 +93,7 @@ draw :: proc() {
 	
 		// Convert buffer to cstring
 		task_cstring := cstring(&task_buffer[0]) 
-		text_width := f32(rl.MeasureText(task_cstring, 30))
+		text_width := f32(rl.MeasureText(task_cstring, FONT_SIZE))
 		rl.GuiLabel({STARTING_POSITION_X, (f32(i) * 40) + OFFSET_Y, text_width, 30}, 
 					task_cstring)
 
