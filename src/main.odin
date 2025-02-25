@@ -47,7 +47,7 @@ init_app :: proc() {
 	rl.GuiSetFont(font)
 
 	if SAVE_TASKS {
-		if app_state_data, ok := os.read_entire_file("tasks.json", context.temp_allocator); ok {
+		if app_state_data, ok := os.read_entire_file("tasks.json", context.allocator); ok {
 			error := json.unmarshal(app_state_data, &app_state)
 			if error != nil {
 				fmt.println("Failed to unmarshal application state data.\nError type: ", error)
@@ -72,7 +72,7 @@ draw :: proc() {
 								cstring(&active_input_buffer[0]), 256, &secret_view)
 	
 	if result == 1 && active_input_buffer[0] != 0 {		
-		new_task := get_cloned_string(cstring(&active_input_buffer[0]))
+		new_task := get_cloned_string(cstring(&active_input_buffer[0]), context.allocator)
 		_, err := append_elem(&app_state.tasks, new_task)
 		assert(err == .None)
 	}
@@ -107,13 +107,13 @@ draw :: proc() {
 
 shutdown_app :: proc() {
 	if SAVE_TASKS {
-		if app_state_data, err := json.marshal(app_state, allocator = context.temp_allocator); err == nil {
+		if app_state_data, err := json.marshal(app_state, allocator = context.allocator); err == nil {
 			os.write_entire_file("tasks.json", app_state_data)
 		}
 	}
 
 	rl.UnloadFont(font)
-	free_all(context.temp_allocator)
+	free_all(context.allocator)
 	delete(app_state.tasks)	
 }
 
