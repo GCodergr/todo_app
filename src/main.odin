@@ -19,6 +19,14 @@ WINDOW_HEIGHT :: 720
 
 FONT_SIZE :: 30
 
+STARTING_PANEL_POSITION_X :: 630
+TAKS_OFFSET_Y :: 10
+
+panel_rect : rl.Rectangle = { STARTING_PANEL_POSITION_X, 30, 630, 650 }	
+panel_content_rect : rl.Rectangle = { 0, 0, 630, 1690 }
+panel_scroll : rl.Vector2 = { 0, 0 }
+panel_view : rl.Rectangle = { 0, 0, 0, 0 }
+
 // Set to false if you don't want to save tasks to tasks.json
 SAVE_TASKS :: true
 
@@ -77,10 +85,11 @@ draw :: proc() {
 		assert(err == .None)
 	}
 
-	STARTING_POSITION_X :: 650
-	OFFSET_Y :: 30
-
 	remove_text_width := f32(rl.MeasureText("Remove", FONT_SIZE))
+	
+	rl.GuiScrollPanel(panel_rect, "Tasks", panel_content_rect, &panel_scroll, &panel_view)
+	
+	rl.BeginScissorMode(i32(panel_view.x), i32(panel_view.y), i32(panel_view.width), i32(panel_view.height))				  
 
 	for task, i in app_state.tasks {
 		// Allocate a buffer for the cstring
@@ -94,13 +103,24 @@ draw :: proc() {
 		// Convert buffer to cstring
 		task_cstring := cstring(&task_buffer[0]) 
 		text_width := f32(rl.MeasureText(task_cstring, FONT_SIZE))
-		rl.GuiLabel({STARTING_POSITION_X, (f32(i) * 40) + OFFSET_Y, text_width, 30}, 
-					task_cstring)
 
-		if rl.GuiButton({WINDOW_WIDTH - remove_text_width - 80, (f32(i) * 40) + OFFSET_Y, 180, 30}, "Remove") {
+		// Task label
+		rl.GuiLabel({ panel_view.x + panel_scroll.x + 12, 
+			panel_view.y + panel_scroll.y + (f32(i) * 40) + TAKS_OFFSET_Y, 
+			text_width, 30 }, task_cstring)
+
+		// Remove button
+		if rl.GuiButton({panel_scroll.x + panel_view.x + panel_content_rect.width - remove_text_width - 32, 
+			panel_view.y + panel_scroll.y + (f32(i) * 40) + TAKS_OFFSET_Y, 
+			remove_text_width, 30 }, "Remove") {
 			ordered_remove(&app_state.tasks, i)
 		}
-	}	
+	}
+
+	// Recalculate the panel content rectangle height
+	panel_content_rect.height = f32(len(app_state.tasks)) * 40 + TAKS_OFFSET_Y 
+	
+	rl.EndScissorMode()
 
 	rl.EndDrawing()
 }
