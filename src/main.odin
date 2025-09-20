@@ -20,7 +20,7 @@ WINDOW_HEIGHT :: 720
 FONT_SIZE :: 30
 
 STARTING_PANEL_POSITION_X :: 630
-TAKS_OFFSET_Y :: 10
+TASKS_OFFSET_Y :: 10
 
 panel_rect : rl.Rectangle = { STARTING_PANEL_POSITION_X, 30, 630, 650 }	
 panel_content_rect : rl.Rectangle = { 0, 0, 630, 1690 }
@@ -106,19 +106,19 @@ draw :: proc() {
 
 		// Task label
 		rl.GuiLabel({ panel_view.x + panel_scroll.x + 12, 
-			panel_view.y + panel_scroll.y + (f32(i) * 40) + TAKS_OFFSET_Y, 
+			panel_view.y + panel_scroll.y + (f32(i) * 40) + TASKS_OFFSET_Y, 
 			text_width, 30 }, task_cstring)
 
 		// Remove button
 		if rl.GuiButton({panel_scroll.x + panel_view.x + panel_content_rect.width - remove_text_width - 32, 
-			panel_view.y + panel_scroll.y + (f32(i) * 40) + TAKS_OFFSET_Y, 
+			panel_view.y + panel_scroll.y + (f32(i) * 40) + TASKS_OFFSET_Y, 
 			remove_text_width, 30 }, "Remove") {
 			ordered_remove(&app_state.tasks, i)
 		}
 	}
 
 	// Recalculate the panel content rectangle height
-	panel_content_rect.height = f32(len(app_state.tasks)) * 40 + TAKS_OFFSET_Y 
+	panel_content_rect.height = f32(len(app_state.tasks)) * 40 + TASKS_OFFSET_Y 
 	
 	rl.EndScissorMode()
 
